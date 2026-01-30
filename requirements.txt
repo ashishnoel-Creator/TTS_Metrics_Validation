@@ -1,0 +1,17 @@
+streamlit
+pandas
+numpy
+librosa
+soundfile
+scipy
+torch
+torchaudio
+onnxruntime
+resampy
+einops
+git+https://github.com/shimhz/SRMRpy.git
+git+https://github.com/AndreevP/wvmos.git
+# Local packages / Internal Dependencies
+# srmrpy and others are assumed to be in the repo structure.
+# But for Streamlit Cloud to find them, we might need to add them to PYTHONPATH or structure them as packages.
+# Since app.py imports from 'metrics.', and 'metrics' is in root, it should work fine if committed.
