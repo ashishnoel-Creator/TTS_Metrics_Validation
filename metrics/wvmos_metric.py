@@ -1,4 +1,5 @@
 from wvmos import get_wvmos
+import streamlit as st
 
 _wvmos_model = None
 
@@ -24,4 +25,5 @@ def calculate_wvmos(audio_path):
         import traceback
         traceback.print_exc()
         print(f"Error calculating WVMOS for {audio_path}: {e}")
+        st.error(f"WVMOS Error: {e}")
         return None

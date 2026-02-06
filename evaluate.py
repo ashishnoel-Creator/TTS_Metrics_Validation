@@ -21,14 +21,8 @@ METRIC_DESCRIPTIONS = {
     'SIGMOS_REVERB': 'Perceived reverberation quality'
 }
 
-THRESHOLDS = {
-    'SRMR': 8.0,
-    'SIGMOS_DISC': 4.0,
-    'VQScore': 0.67,
-    'WVMOS': 4.0,
-    'SIGMOS_OVRL': 3.0,
-    'SIGMOS_REVERB': 3.5
-}
+import config
+THRESHOLDS = config.THRESHOLDS
 
 def evaluate_file(file_path):
     # Calculate all scores first
