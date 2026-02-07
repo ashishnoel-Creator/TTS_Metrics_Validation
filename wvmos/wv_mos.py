@@ -51,7 +51,7 @@ class Wav2Vec2FullEncoder:
     
     
 class Wav2Vec2MOS(nn.Module):
-    def __init__(self, path, freeze=True, cuda=True):
+    def __init__(self, path, freeze=True, cuda=True, device=None):
         super().__init__()
         self.encoder = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base")
         self.freeze = freeze
@@ -73,9 +73,15 @@ class Wav2Vec2MOS(nn.Module):
         checkpoint_data = torch.load(path, map_location='cpu', weights_only=False)
         self.load_state_dict(extract_prefix('model.', checkpoint_data['state_dict']))
         self.eval()
-        self.cuda_flag = cuda
-        if cuda:
-            self.cuda()
+        
+        if device is not None:
+            self.device = torch.device(device)
+        elif cuda and torch.cuda.is_available():
+            self.device = torch.device('cuda')
+        else:
+            self.device = torch.device('cpu')
+            
+        self.to(self.device)
         self.processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base")
         
     def forward(self, x):
@@ -95,8 +101,7 @@ class Wav2Vec2MOS(nn.Module):
         for path in tqdm.tqdm(sorted(glob.glob(f"{path}/*.wav"))):
             signal = librosa.load(path, sr=16_000)[0]
             x = self.processor(signal, return_tensors="pt", padding=True, sampling_rate=16000).input_values
-            if self.cuda_flag:
-                x = x.cuda()
+            x = x.to(self.device)
             with torch.no_grad():
                 res = self.forward(x).mean()
             pred_mos.append(res.item())
@@ -134,8 +139,7 @@ class Wav2Vec2MOS(nn.Module):
             # Score EVERYTHING (including silence) to match "Whole File" accuracy.
             x = self.processor(chunk, return_tensors="pt", padding=True, sampling_rate=16000).input_values
             with torch.no_grad():
-                if self.cuda_flag:
-                    x = x.cuda()
+                x = x.to(self.device)
                 val = self.forward(x).mean().cpu().item()
                 
                 # Weight by length

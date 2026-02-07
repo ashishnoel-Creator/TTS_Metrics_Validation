@@ -12,6 +12,13 @@ def clean_previous_report():
     if os.path.exists(OUTPUT_REPORT):
         print(f"Cleaning up previous report: {OUTPUT_REPORT}")
         os.remove(OUTPUT_REPORT)
+    
+    # Also clean up temp chunks if they exist
+    for root, dirs, files in os.walk(INPUT_DIR):
+        if "temp_smart_chunks" in dirs:
+            chunks_path = os.path.join(root, "temp_smart_chunks")
+            print(f"Cleaning up temp chunks: {chunks_path}")
+            shutil.rmtree(chunks_path)
 
 def run_analysis():
     # 1. Check if input directory exists
@@ -21,10 +28,15 @@ def run_analysis():
         print(f"Please put your audio files in '{INPUT_DIR}' and run this script again.")
         return
 
-    # 2. Check if there are audio files
-    files = [f for f in os.listdir(INPUT_DIR) if f.lower().endswith(('.wav', '.mp3', '.flac'))]
+    # 2. Check if there are audio files (Recursive)
+    files = []
+    for root, dirs, filenames in os.walk(INPUT_DIR):
+        for filename in filenames:
+            if filename.lower().endswith(('.wav', '.mp3', '.flac')):
+                files.append(os.path.join(root, filename))
+                
     if not files:
-        print(f"No audio files found in '{INPUT_DIR}'. Please add some files.")
+        print(f"No audio files found in '{INPUT_DIR}' (checked subdirectories too). Please add some files.")
         return
 
     # 3. Clean previous report

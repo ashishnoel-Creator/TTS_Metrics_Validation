@@ -18,5 +18,5 @@ else:
         )
         print('Weights downloaded in: {} Size: {}'.format(path, os.path.getsize(path)))
     
-def get_wvmos(cuda=True):
-    return Wav2Vec2MOS(path, cuda=cuda)
+def get_wvmos(cuda=True, device=None):
+    return Wav2Vec2MOS(path, cuda=cuda, device=device)

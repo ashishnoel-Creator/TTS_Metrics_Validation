@@ -15,10 +15,7 @@ _vqscore_config = None
 _device = None
 
 def stft_magnitude(x, hop_size, fft_size=512, win_length=512):
-    if x.is_cuda:
-        window = torch.hann_window(win_length).to(x.device)
-    else:
-        window = torch.hann_window(win_length)
+    window = torch.hann_window(win_length).to(x.device)
         
     x_stft = torch.stft(
         x, fft_size, hop_size, win_length, window=window, return_complex=False
@@ -50,11 +47,14 @@ def load_model():
     with open(config_path, 'r') as f:
         _vqscore_config = yaml.load(f, Loader=yaml.FullLoader)
         
-    if torch.cuda.is_available():
+    if torch.backends.mps.is_available():
+        _device = torch.device('mps')
+    elif torch.cuda.is_available():
         _device = torch.device('cuda')
     else:
         _device = torch.device('cpu')
         
+    print(f"Loading VQScore model on {_device}...")
     _vqscore_model = VQVAE_QE(**_vqscore_config['VQVAE_params']).to(_device).eval()
     
     # Load weights

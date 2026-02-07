@@ -6,10 +6,17 @@ _wvmos_model = None
 def get_model():
     global _wvmos_model
     if _wvmos_model is None:
-        # cuda=False for compatibility, or check availability
+        # Auto-detect device (MPS for Mac, CUDA for NVIDIA, CPU otherwise)
         import torch
-        cuda = torch.cuda.is_available()
-        _wvmos_model = get_wvmos(cuda=cuda)
+        if torch.backends.mps.is_available():
+            device = 'mps'
+        elif torch.cuda.is_available():
+            device = 'cuda'
+        else:
+            device = 'cpu'
+            
+        print(f"Loading WVMOS model on {device}...")
+        _wvmos_model = get_wvmos(device=device)
     return _wvmos_model
 
 def calculate_wvmos(audio_path):

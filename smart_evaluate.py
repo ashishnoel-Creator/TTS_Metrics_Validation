@@ -20,7 +20,7 @@ METRIC_DESCRIPTIONS = {
     'SIGMOS_REVERB': 'Perceived reverberation quality'
 }
 
-def process_file_smart(input_path, max_chunks=None):
+def process_file_smart(input_path, max_chunks=None, force_full=False):
     print(f"Processing {input_path}...")
     
     try:
@@ -30,10 +30,47 @@ def process_file_smart(input_path, max_chunks=None):
         duration_sec = info.duration
         print(f"Total Duration: {duration_sec/60:.2f} mins")
         
-        # Local Analysis updates: Analyze full duration (No Sampling)
-        # User requested that local analysis should not split the file.
-        print("Analyzing full duration...")
-        chunk_paths = [input_path]
+        # Smart Sampling (Default) vs Full Analysis
+        if force_full:
+            print("Force Full: Analyzing full duration...")
+            chunk_paths = [input_path]
+        elif duration_sec > 180: # > 3 minutes
+            num_chunks = 5
+            chunk_duration = 30.0
+            print(f"Large file. Using Smart Sampling ({num_chunks} chunks of {chunk_duration}s)...")
+            
+            # Create chunks list
+            chunk_paths = []
+            segment_length = duration_sec / num_chunks
+            
+            # Ensure chunks temp dir
+            chunks_dir = os.path.join(os.path.dirname(input_path), "temp_smart_chunks")
+            os.makedirs(chunks_dir, exist_ok=True)
+            
+            for i in range(num_chunks):
+                # Center of the segment
+                segment_center = (i * segment_length) + (segment_length / 2)
+                start_time = max(0, segment_center - (chunk_duration / 2))
+                
+                # Boundary checks
+                if start_time + chunk_duration > duration_sec:
+                    start_time = max(0, duration_sec - chunk_duration)
+                
+                try:
+                    y_chunk, sr_chunk = librosa.load(input_path, sr=None, offset=start_time, duration=chunk_duration)
+                    chunk_filename = f"{os.path.basename(input_path)}_chunk_{i}.wav"
+                    chunk_path = os.path.join(chunks_dir, chunk_filename)
+                    sf.write(chunk_path, y_chunk, sr_chunk)
+                    chunk_paths.append(chunk_path)
+                except Exception as e:
+                    print(f"Error extracting chunk {i}: {e}")
+                    
+            if not chunk_paths:
+                print("Warning: Sampling failed, falling back to full file.")
+                chunk_paths = [input_path]
+        else:
+            print("Short file. Analyzing full duration...")
+            chunk_paths = [input_path]
         
         chunk_scores = {metric: [] for metric in THRESHOLDS.keys()}
         
@@ -86,6 +123,7 @@ def main():
     parser.add_argument('input_path', help='Path to input audio file or directory')
     parser.add_argument('--output', default='smart_avg_report.csv', help='Output CSV file')
     parser.add_argument('--max-chunks', type=int, default=None, help='Maximum number of chunks to evaluate per file')
+    parser.add_argument('--full', action='store_true', help='Force full-file analysis (disable sampling)')
     
     args = parser.parse_args()
     input_path = args.input_path
@@ -108,7 +146,7 @@ def main():
     
     all_rows = []
     for file_path in tqdm(files):
-        file_rows = process_file_smart(file_path, max_chunks=args.max_chunks)
+        file_rows = process_file_smart(file_path, max_chunks=args.max_chunks, force_full=args.full)
         all_rows.extend(file_rows)
         
     # Save master report
