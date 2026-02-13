@@ -12,7 +12,7 @@ New Audio/
 repos/
 
 # Deployment logic (Keep app.py, packages.txt, and .streamlit)
-deploy_to_hf.py
+
 
 # Heavy Assets
 models/*.ckpt

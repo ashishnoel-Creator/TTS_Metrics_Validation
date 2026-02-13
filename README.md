@@ -25,6 +25,29 @@ license: apache-2.0
 
 ---
 
+## Deployment (Git)
+
+This project is deployed to Hugging Face Spaces using standard Git commands.
+
+To update the application:
+1.  **Commit your changes locally:**
+    ```bash
+    git add .
+    git commit -m "Your commit message"
+    ```
+2.  **Push to Hugging Face Spaces:**
+    ```bash
+    git push space main
+    ```
+    *(Note: You must have the `space` remote configured. If not, add it: `git remote add space https://huggingface.co/spaces/AshishNoel14/tts-validation`)*
+
+3.  **Push to GitHub:**
+    ```bash
+    git push origin main
+    ```
+
+---
+
 ## Metric Details
 - **SRMR**: Service, Room, and Modulation Quality. (Higher is better, >6.0)
 - **SigMOS**: Signal Quality (Discontinuity, Overall, Reverb). (1-5 scale)
