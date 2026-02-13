@@ -1,0 +1,8 @@
+[client]
+toolbarMode = "viewer"
+
+[ui]
+hideTopBar = true
+
+[server]
+maxUploadSize = 1024
