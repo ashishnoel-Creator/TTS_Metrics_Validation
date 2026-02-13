@@ -8,7 +8,7 @@ temp_smart_chunks/
 *.csv
 New Audio/
 repos/
-app.py
+
 deploy_to_hf.py
 packages.txt
 input_audio/
