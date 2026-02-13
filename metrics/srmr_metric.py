@@ -26,6 +26,8 @@ def calculate_srmr(audio_path):
             fs = TARGET_SR
             
         score = srmr(y, fs)
+        if isinstance(score, (tuple, list, np.ndarray)) and len(score) > 0:
+             score = score[0]
         return float(score)
     except Exception as e:
         print(f"Error calculating SRMR for {audio_path}: {e}")
