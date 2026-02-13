@@ -12,6 +12,8 @@ THRESHOLDS = {
     'Mic SR': 16000         # Effective captured bandwidth (Hz)
 }
 
+GIT_VERSION = "5ea5b92"
+
 METRIC_DESCRIPTIONS = {
     'SRMR': 'Technical measurement of reverberation and room acoustics',
     'SIGMOS_DISC': 'Audio continuity and smoothness',

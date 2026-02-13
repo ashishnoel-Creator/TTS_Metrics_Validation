@@ -42,6 +42,11 @@ st.sidebar.markdown("### Passing Criteria")
 st.sidebar.info("These thresholds are set by the administrator.")
 st.sidebar.table(pd.DataFrame(list(THRESHOLDS.items()), columns=['Metric', 'Min Score']).set_index('Metric'))
 
+try:
+    st.sidebar.caption(f"App Version: `{config.GIT_VERSION}`")
+except AttributeError:
+    pass
+
 
 METRIC_DESCRIPTIONS = {
     'SRMR': 'Technical measurement of reverberation and room acoustics',
