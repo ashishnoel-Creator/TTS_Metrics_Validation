@@ -2,14 +2,17 @@ venv/
 __pycache__/
 *.pyc
 .DS_Store
+
+# Temporary Data
 temp_chunks/
 temp_smart_chunks/
-.streamlit/
+input_audio/
 *.csv
 New Audio/
 repos/
 
+# Deployment logic (Keep app.py, packages.txt, and .streamlit)
 deploy_to_hf.py
-packages.txt
-input_audio/
+
+# Heavy Assets
 models/*.ckpt
